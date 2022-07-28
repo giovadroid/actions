@@ -1,0 +1,67 @@
+# cargo/version/action.yml
+name: Get cargo version
+description: 'Get version for rust projects'
+inputs:
+  bump:
+    required: false
+    description: 'Bump version args: example: patch, minor, major, -p dev'
+    default: 'false'
+outputs:
+  version:
+    description: 'Version of cargo'
+    value: ${{ steps.win.outputs.pkg_version }}${{ steps.linux.outputs.pkg_version }}
+  version-code:
+    description: 'Version of cargo without strings'
+    value: ${{ steps.win.outputs.version_code }}${{ steps.linux.outputs.version_code }}
+
+runs:
+  using: 'composite'
+  steps:
+    - run: |
+        echo "Getting dependencies"
+        cargo install cargo-bump cargo-get
+      shell: bash
+      if: runner.os == 'Linux'
+    - run: |
+        echo "Getting dependencies"
+        cargo install cargo-bump cargo-get
+      shell: powershell
+      if: runner.os == 'Windows'
+
+    - run: |
+        echo "Bumping version"
+        OLD_VERSION = $(cargo get version --pretty)
+        cargo bump ${{inputs.bump}}
+        NEW_VERSION = $(cargo get version --pretty)
+        echo "::notice:: Bumped version from $OLD_VERSION to $NEW_VERSION"
+      shell: bash
+      if: runner.os == 'Linux' && inputs.bump != 'false'
+    - run: |
+        echo "Bumping version"
+        $OLD_VERSION = cargo get version --pretty
+        cargo bump ${{inputs.bump}}
+        $NEW_VERSION = cargo get version --pretty
+        echo "::notice:: Bumped version from $OLD_VERSION to $NEW_VERSION"
+
+      shell: powershell
+      if: runner.os == 'Windows' && inputs.bump != 'false'
+
+    - run: |
+        echo "Extracting version for Linux"
+        echo "pkg_version=$(cargo get version --pretty)" >> $GITHUB_ENV
+        echo "::set-output name=pkg_version::$(cargo get version --pretty)"
+        echo "::set-output name=version_code::$(cargo get version --pretty| sed "s/-dev//"| sed "s/^v//g")"
+      shell: bash
+      id: linux
+      if: runner.os == 'Linux'
+    - run: |
+        echo "Extracting version for Windows"
+        $PKG_VERSION = cargo get version --pretty
+        $PKG_VERSION_CODE = $PKG_VERSION.replace('-dev','').replace("v","")
+        echo "pkg_version=$PKG_VERSION\npkg_version_code=$PKG_VERSION_CODE" | Out-File -FilePath $env:GITHUB_ENV -Append
+        echo "::set-output name=pkg_version::$PKG_VERSION"
+        echo "::set-output name=version_code::$PKG_VERSION_CODE"
+      if: runner.os == 'Windows'
+      id: win
+      shell: powershell
+

@@ -1,0 +1,36 @@
+# commit-and-push/action.yml
+name: Push changes
+description: 'Commit and push changes to the repository'
+inputs:
+  user:
+    required: false
+    default: "Workflow User"
+    description: 'User name to be used for the commit'
+  email:
+    required: false
+    default: "default@example.com"
+    description: 'Email address to be used for the commit'
+  message:
+    required: true
+    default: "Update"
+    description: 'Message to be used for the commit'
+
+runs:
+  using: 'composite'
+  steps:
+    - run: |
+        git config user.email "${{inputs.email}}"
+        git config user.name "${{inputs.user}}"
+        git remote set-url origin https://x-access-token:${{github.token}}@github.com/${{github.repository}}.git
+        git commit Cargo.toml -m "${{inputs.message}}"
+        git push
+      shell: bash
+      if: runner.os == 'Linux'
+    - run: |
+        git config user.email "${{inputs.email}}"
+        git config user.name "${{inputs.user}}"
+        git remote set-url origin https://x-access-token:${{github.token}}@github.com/${{github.repository}}.git
+        git commit Cargo.toml -m "${{inputs.message}}"
+        git push
+      shell: powershell
+      if: runner.os == 'Windows'

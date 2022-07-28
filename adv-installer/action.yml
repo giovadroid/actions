@@ -1,0 +1,34 @@
+# adv-installer/action.yml
+name: Advanced installer build
+description: Pack With Advanced Installer
+inputs:
+  project:
+    required: true
+    description: Project path from root directory
+  product_version:
+    required: true
+    description: Version to be used
+    default: None
+  output:
+    required: false
+    description: Output path from root directory
+    default: ''
+  binary:
+    required: false
+    description: Binary to be used
+    default: 'C:\\Program Files (x86)\\Caphyon\\Advanced Installer 19.7\\bin\\x86\\AdvancedInstaller.com'
+
+runs:
+  using: composite
+  steps:
+    - run: |
+        echo "Updating project version"
+        & "${{inputs.binary}}" /edit ${{inputs.project}} /SetVersion ${{inputs.product_version}}
+#        "git commit ${{inputs.projects}} -m 'Update version to ${{inputs.product_version}}'"
+      shell: powershell
+      if: inputs.product_version != 'None'
+    - run: |
+        echo "Packing Installer $env:PWD"
+        & "${{inputs.binary}}" /Build ${{inputs.project}}
+        echo "::notice:: Advanced Installer ${{ inputs.product_version }} version generated"
+      shell: powershell

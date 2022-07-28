@@ -1,0 +1,39 @@
+# cargo/test/action.yml
+name: Cargo Tester
+description: 'Build rust projects with cargo tool'
+
+inputs:
+  audit:
+    required: false
+    description: 'Build devel version'
+    default: ''
+  extra-args:
+    required: false
+    description: 'Extra arguments to be used'
+    default: ''
+
+runs:
+  using: 'composite'
+  steps:
+    - run: |
+        echo "Auditing code"
+        cargo install cargo-audit 
+        cargo audit ${{inputs.extra-args}}
+      shell: bash
+      if: runner.os == 'Linux' && inputs.audit == 'true'
+    - run: |
+        echo "Auditing code"
+        cargo install cargo-audit
+        cargo audit ${{inputs.extra-args}}
+      shell: powershell
+      if: runner.os == 'Windows' && inputs.audit == 'true'
+    - run: |
+        echo "Testing code"
+        cargo test ${{inputs.extra-args}}
+      shell: bash
+      if: runner.os == 'Linux'
+    - run: |
+        echo "Testing code"
+        cargo test ${{inputs.extra-args}}
+      shell: powershell
+      if: runner.os == 'Windows'
