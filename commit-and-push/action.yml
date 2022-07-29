@@ -14,6 +14,10 @@ inputs:
     required: true
     default: "Update"
     description: 'Message to be used for the commit'
+  tag:
+    required: false
+    default: "latest"
+    description: 'Tag to be used for the commit'
 
 runs:
   using: 'composite'
@@ -23,7 +27,8 @@ runs:
         git config user.name "${{inputs.user}}"
         git remote set-url origin https://x-access-token:${{github.token}}@github.com/${{github.repository}}.git
         git commit Cargo.toml -m "${{inputs.message}}"
-        git push
+        git tag $${{inputs.tag}} -f
+        git push --tags
       shell: bash
       if: runner.os == 'Linux'
     - run: |
@@ -31,6 +36,7 @@ runs:
         git config user.name "${{inputs.user}}"
         git remote set-url origin https://x-access-token:${{github.token}}@github.com/${{github.repository}}.git
         git commit Cargo.toml -m "${{inputs.message}}"
-        git push
+        git tag $${{inputs.tag}} -f
+        git push --tags
       shell: powershell
       if: runner.os == 'Windows'
