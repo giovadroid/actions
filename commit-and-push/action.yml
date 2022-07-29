@@ -28,7 +28,8 @@ runs:
         git remote set-url origin https://x-access-token:${{github.token}}@github.com/${{github.repository}}.git
         git commit Cargo.toml -m "${{inputs.message}}"
         git tag ${{inputs.tag}} -f
-        git push --tags
+        git push
+        git push --tags -f
       shell: bash
       if: runner.os == 'Linux'
     - run: |
@@ -37,6 +38,7 @@ runs:
         git remote set-url origin https://x-access-token:${{github.token}}@github.com/${{github.repository}}.git
         git commit Cargo.toml -m "${{inputs.message}}"
         git tag ${{inputs.tag}} -f
-        git push --tags
+        git push
+        git push --tags -f
       shell: powershell
       if: runner.os == 'Windows'
