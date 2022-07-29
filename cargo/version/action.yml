@@ -30,9 +30,9 @@ runs:
 
     - run: |
         echo "Bumping version"
-        OLD_VERSION = $(cargo get version --pretty)
+        OLD_VERSION=$(cargo get version --pretty)
         cargo bump ${{inputs.bump}}
-        NEW_VERSION = $(cargo get version --pretty)
+        NEW_VERSION=$(cargo get version --pretty)
         echo "::notice:: Bumped version from $OLD_VERSION to $NEW_VERSION"
       shell: bash
       if: runner.os == 'Linux' && inputs.bump != 'false'
