@@ -27,7 +27,7 @@ runs:
         git config user.name "${{inputs.user}}"
         git remote set-url origin https://x-access-token:${{github.token}}@github.com/${{github.repository}}.git
         git commit Cargo.toml -m "${{inputs.message}}"
-        git tag $${{inputs.tag}} -f
+        git tag ${{inputs.tag}} -f
         git push --tags
       shell: bash
       if: runner.os == 'Linux'
@@ -36,7 +36,7 @@ runs:
         git config user.name "${{inputs.user}}"
         git remote set-url origin https://x-access-token:${{github.token}}@github.com/${{github.repository}}.git
         git commit Cargo.toml -m "${{inputs.message}}"
-        git tag $${{inputs.tag}} -f
+        git tag ${{inputs.tag}} -f
         git push --tags
       shell: powershell
       if: runner.os == 'Windows'
